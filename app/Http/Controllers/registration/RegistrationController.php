@@ -1,15 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
-use App\Models\RoleModel;
+namespace App\Http\Controllers\registration;
+use App\Models\registration\RoleModel;
+use App\Models\registration\UserModel;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class RegistrationController extends Controller
 {
     public function register(){
        // dd('reached in Register Method');
-       $registration_txt="Welcome to Registration Page";
-       return view('register')->with(compact('registration_txt'));
+       $response_data = RoleModel::where('status','Active')->get();
+       return view('register')->with('response_data', $response_data);
     }
 
     public function create_role(Request $request){
@@ -39,7 +41,7 @@ class RegistrationController extends Controller
             //select * from t_role_master where status='Active';
         }
           
-       return view('list_roles')->with(compact('response_data'));
+       return view('registration/list_roles')->with(compact('response_data'));
 
     }
     public function edit_role($id){
@@ -62,6 +64,22 @@ class RegistrationController extends Controller
         ];
         //dd($role_data);
         RoleModel::where('id',$request->record_id)->update($role_data);
+        return redirect()->away('/get_role_list/All/NA/All');
+    }
+    public function register_new_user(Request $request){
+        $user_data=[
+            'full_name'         => $request->full_name,
+            'Phone_number'      => $request->Phone_number,
+            'email'             => $request->email,
+            'password'          => $request->password,
+            'role_id'           => $request->role,
+            'created_by'        => 1,
+            'created_at'        => date('Y-m-d h:i:s'),
+            'updated_by'        => 1,
+            'updated_at'        => date('Y-m-d h:i:s'),
+        ];
+        // dd($user_data);
+        UserModel::create($user_data);
         return redirect()->away('/get_role_list/All/NA/All');
     }
 }
